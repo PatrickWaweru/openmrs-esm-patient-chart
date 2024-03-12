@@ -42,11 +42,21 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { Add, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
-import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
-import { labsOrderBasket, medicationsOrderBasket } from '../constants';
+import {
+  buildLabOrder,
+  buildRadiologyOrder,
+  buildProceduresOrder,
+  buildMedicationOrder,
+  compare,
+  orderPriorityToColor,
+  orderStatusColor,
+} from '../utils/utils';
+import { labsOrderBasket, medicationsOrderBasket, radiologyOrderBasket, proceduresOrderBasket } from '../constants';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
+import RadiologyOrder from './radiology-order.component';
+import ProceduresOrder from './procedures-order.component';
 import styles from './order-details-table.scss';
 
 interface OrderDetailsProps {
@@ -403,6 +413,10 @@ function ExpandedRowView({ row }: { row: any }) {
     return <MedicationRecord medication={orderItem} />;
   } else if (orderItem.type == 'testorder') {
     return <TestOrder testOrder={orderItem} />;
+  } else if (orderItem.type == 'radiologyorder') {
+    return <RadiologyOrder radiologyOrder={orderItem} />;
+  } else if (orderItem.type == 'proceduresorder') {
+    return <ProceduresOrder proceduresOrder={orderItem} />;
   } else {
     return (
       <div>
@@ -421,7 +435,10 @@ function OrderBasketItemActions({
 }: {
   orderItem: Order;
   items: Array<MutableOrderBasketItem>;
-  setOrderItems: (orderType: 'labs' | 'medications', items: Array<MutableOrderBasketItem>) => void;
+  setOrderItems: (
+    orderType: 'labs' | 'medications' | 'radiology' | 'procedures',
+    items: Array<MutableOrderBasketItem>,
+  ) => void;
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
 }) {
@@ -444,8 +461,18 @@ function OrderBasketItemActions({
         setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
         openOrderBasket();
       });
-    } else {
+      // } else {
+      //   setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      //   openOrderBasket();
+      // }
+    } else if (orderItem.type === 'testorder') {
       setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      openOrderBasket();
+    } else if (orderItem.type === 'radiologyorder') {
+      setOrderItems(radiologyOrderBasket, [...items, buildRadiologyOrder(orderItem, 'DISCONTINUE')]);
+      openOrderBasket();
+    } else if (orderItem.type === 'proceduresorder') {
+      setOrderItems(proceduresOrderBasket, [...items, buildProceduresOrder(orderItem, 'DISCONTINUE')]);
       openOrderBasket();
     }
   }, [orderItem, items, setOrderItems, openOrderBasket]);
