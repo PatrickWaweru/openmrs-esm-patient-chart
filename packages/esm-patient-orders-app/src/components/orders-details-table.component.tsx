@@ -42,8 +42,15 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { Add, Printer } from '@carbon/react/icons';
 import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
-import { buildLabOrder, buildMedicationOrder, compare, orderPriorityToColor, orderStatusColor } from '../utils/utils';
-import { labsOrderBasket, medicationsOrderBasket } from '../constants';
+import {
+  buildLabOrder,
+  buildRadiologyOrder,
+  buildMedicationOrder,
+  compare,
+  orderPriorityToColor,
+  orderStatusColor,
+} from '../utils/utils';
+import { labsOrderBasket, medicationsOrderBasket, radiologyOrderBasket } from '../constants';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
@@ -421,7 +428,7 @@ function OrderBasketItemActions({
 }: {
   orderItem: Order;
   items: Array<MutableOrderBasketItem>;
-  setOrderItems: (orderType: 'labs' | 'medications', items: Array<MutableOrderBasketItem>) => void;
+  setOrderItems: (orderType: 'labs' | 'medications' | 'radiology', items: Array<MutableOrderBasketItem>) => void;
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
 }) {
@@ -444,8 +451,11 @@ function OrderBasketItemActions({
         setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
         openOrderBasket();
       });
-    } else {
+    } else if (orderItem.type === 'laborder') {
       setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      openOrderBasket();
+    } else if (orderItem.type === 'radiologyorder') {
+      setOrderItems(radiologyOrderBasket, [...items, buildRadiologyOrder(orderItem, 'DISCONTINUE')]);
       openOrderBasket();
     }
   }, [orderItem, items, setOrderItems, openOrderBasket]);
