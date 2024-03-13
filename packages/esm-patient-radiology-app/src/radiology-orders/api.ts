@@ -74,7 +74,7 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
-      type: 'testorder',
+      type: 'radiologyorder',
       patient: patientUuid,
       careSetting: careSettingUuid,
       orderer: order.orderer,
@@ -86,7 +86,7 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
   } else if (order.action === 'REVISE') {
     return {
       action: 'REVISE',
-      type: 'testorder',
+      type: 'radiologyorder',
       patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,
@@ -99,7 +99,7 @@ export function prepLabOrderPostData(order: LabOrderBasketItem, patientUuid: str
   } else if (order.action === 'DISCONTINUE') {
     return {
       action: 'DISCONTINUE',
-      type: 'testorder',
+      type: 'radiologyorder',
       patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,

@@ -38,8 +38,8 @@
       "component": "printModal"
     },
     {
-      "name": "lab-order-panel",
-      "component": "labOrderPanel",
+      "name": "radiology-order-panel",
+      "component": "radiologyOrderPanel",
       "slot": "order-basket-slot",
       "order": 2
     }

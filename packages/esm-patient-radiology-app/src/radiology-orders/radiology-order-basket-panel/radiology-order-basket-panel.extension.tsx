@@ -63,14 +63,14 @@ export default function RadiologyOrderBasketPanelExtension() {
   const openNewLabForm = useCallback(() => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order'),
+      onWorkspaceClose: () => launchPatientWorkspace('add-radiology-order'),
     });
   }, []);
 
   const openEditLabForm = useCallback((order: OrderBasketItem) => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
-      onWorkspaceClose: () => launchPatientWorkspace('add-lab-order', { order }),
+      onWorkspaceClose: () => launchPatientWorkspace('add-radiology-order', { order }),
     });
   }, []);
 

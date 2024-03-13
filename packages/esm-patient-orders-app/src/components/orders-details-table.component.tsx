@@ -54,6 +54,7 @@ import { labsOrderBasket, medicationsOrderBasket, radiologyOrderBasket } from '.
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
+import RadiologyOrder from './radiology-order.component';
 import styles from './order-details-table.scss';
 
 interface OrderDetailsProps {
@@ -410,6 +411,8 @@ function ExpandedRowView({ row }: { row: any }) {
     return <MedicationRecord medication={orderItem} />;
   } else if (orderItem.type == 'testorder') {
     return <TestOrder testOrder={orderItem} />;
+  } else if (orderItem.type == 'radiologyorder') {
+    return <RadiologyOrder radiologyOrder={orderItem} />;
   } else {
     return (
       <div>
@@ -451,7 +454,11 @@ function OrderBasketItemActions({
         setOrderItems(medicationsOrderBasket, [...items, buildMedicationOrder(medicationOrder, 'DISCONTINUE')]);
         openOrderBasket();
       });
-    } else if (orderItem.type === 'laborder') {
+      // } else {
+      //   setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
+      //   openOrderBasket();
+      // }
+    } else if (orderItem.type === 'testorder') {
       setOrderItems(labsOrderBasket, [...items, buildLabOrder(orderItem, 'DISCONTINUE')]);
       openOrderBasket();
     } else if (orderItem.type === 'radiologyorder') {
