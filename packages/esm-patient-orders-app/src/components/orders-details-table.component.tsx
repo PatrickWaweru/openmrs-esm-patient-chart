@@ -45,16 +45,18 @@ import { age, formatDate, useConfig, useLayoutType, usePagination, usePatient } 
 import {
   buildLabOrder,
   buildRadiologyOrder,
+  buildProceduresOrder,
   buildMedicationOrder,
   compare,
   orderPriorityToColor,
   orderStatusColor,
 } from '../utils/utils';
-import { labsOrderBasket, medicationsOrderBasket, radiologyOrderBasket } from '../constants';
+import { labsOrderBasket, medicationsOrderBasket, radiologyOrderBasket, proceduresOrderBasket } from '../constants';
 import MedicationRecord from './medication-record.component';
 import PrintComponent from '../print/print.component';
 import TestOrder from './test-order.component';
 import RadiologyOrder from './radiology-order.component';
+import ProceduresOrder from './procedures-order.component';
 import styles from './order-details-table.scss';
 
 interface OrderDetailsProps {
@@ -413,6 +415,8 @@ function ExpandedRowView({ row }: { row: any }) {
     return <TestOrder testOrder={orderItem} />;
   } else if (orderItem.type == 'radiologyorder') {
     return <RadiologyOrder radiologyOrder={orderItem} />;
+  } else if (orderItem.type == 'proceduresorder') {
+    return <ProceduresOrder proceduresOrder={orderItem} />;
   } else {
     return (
       <div>
@@ -431,7 +435,10 @@ function OrderBasketItemActions({
 }: {
   orderItem: Order;
   items: Array<MutableOrderBasketItem>;
-  setOrderItems: (orderType: 'labs' | 'medications' | 'radiology', items: Array<MutableOrderBasketItem>) => void;
+  setOrderItems: (
+    orderType: 'labs' | 'medications' | 'radiology' | 'procedures',
+    items: Array<MutableOrderBasketItem>,
+  ) => void;
   openOrderBasket: () => void;
   openOrderForm: (additionalProps?: { order: MutableOrderBasketItem }) => void;
 }) {
@@ -463,6 +470,9 @@ function OrderBasketItemActions({
       openOrderBasket();
     } else if (orderItem.type === 'radiologyorder') {
       setOrderItems(radiologyOrderBasket, [...items, buildRadiologyOrder(orderItem, 'DISCONTINUE')]);
+      openOrderBasket();
+    } else if (orderItem.type === 'proceduresorder') {
+      setOrderItems(proceduresOrderBasket, [...items, buildProceduresOrder(orderItem, 'DISCONTINUE')]);
       openOrderBasket();
     }
   }, [orderItem, items, setOrderItems, openOrderBasket]);

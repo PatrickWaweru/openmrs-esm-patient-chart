@@ -160,3 +160,32 @@ export function buildRadiologyOrder(order: Order, action?: OrderAction) {
     specimenSource: null,
   };
 }
+
+/**
+ * Builds procedures order object from the given order object
+ */
+export function buildProceduresOrder(order: Order, action?: OrderAction) {
+  let previousOrder = null;
+  if (action === 'REVISE' || action === 'DISCONTINUE') {
+    previousOrder = order.uuid;
+  }
+  return {
+    uuid: order.uuid,
+    action: action,
+    display: order.display,
+    previousOrder: previousOrder,
+    orderer: order.orderer.uuid,
+    careSetting: order.careSetting.uuid,
+    instructions: order.instructions,
+    urgency: order.urgency,
+    labReferenceNumber: order.labReferenceNumber,
+    testType: {
+      label: order.concept.display,
+      conceptUuid: order.concept.uuid,
+    },
+    orderNumber: order.orderNumber,
+    concept: order.concept.uuid,
+    orderType: order.orderType.uuid,
+    specimenSource: null,
+  };
+}
