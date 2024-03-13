@@ -12,7 +12,7 @@ import {
   type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { LabOrderBasketItemTile } from './procedures-order-basket-item-tile.component';
-import { prepLabOrderPostData } from '../api';
+import { prepProceduresOrderPostData } from '../api';
 import LabIcon from './procedures-icon.component';
 import styles from './procedures-order-basket-panel.scss';
 
@@ -22,7 +22,7 @@ import styles from './procedures-order-basket-panel.scss';
 export default function ProceduresOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepProceduresOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,

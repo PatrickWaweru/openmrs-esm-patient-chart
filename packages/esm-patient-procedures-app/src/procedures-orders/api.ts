@@ -70,7 +70,11 @@ export function useOrderReasons(conceptUuids: Array<string>) {
   return { orderReasons: orderReasons, isLoading };
 }
 
-export function prepProceduresOrderPostData(order: LabOrderBasketItem, patientUuid: string, encounterUuid: string): OrderPost {
+export function prepProceduresOrderPostData(
+  order: LabOrderBasketItem,
+  patientUuid: string,
+  encounterUuid: string,
+): OrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',

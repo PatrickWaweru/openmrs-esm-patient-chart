@@ -9,11 +9,11 @@ import {
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   type OrderBasketItem,
-  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { TestTypeSearch } from './test-type-search';
-import { LabOrderForm } from './radiology-order-form.component';
+import { RadiologyOrderForm } from './radiology-order-form.component';
 import styles from './add-radiology-order.scss';
+import { type RadiologyOrderBasketItem } from '../../types';
 
 export interface AddRadiologyOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
@@ -31,7 +31,7 @@ export default function AddRadiologyOrderWorkspace({
   const { t } = useTranslation();
 
   const { patient, isLoading: isLoadingPatient } = usePatient();
-  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
+  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as RadiologyOrderBasketItem);
 
   const isTablet = useLayoutType() === 'tablet';
 
@@ -71,7 +71,7 @@ export default function AddRadiologyOrderWorkspace({
       {!currentLabOrder ? (
         <TestTypeSearch openLabForm={setCurrentLabOrder} />
       ) : (
-        <LabOrderForm
+        <RadiologyOrderForm
           initialOrder={currentLabOrder}
           closeWorkspace={closeWorkspace}
           closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}

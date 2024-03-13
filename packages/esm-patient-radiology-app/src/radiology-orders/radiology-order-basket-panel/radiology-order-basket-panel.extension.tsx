@@ -9,12 +9,12 @@ import {
   type OrderBasketItem,
   useOrderBasket,
   closeWorkspace,
-  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { LabOrderBasketItemTile } from './radiology-order-basket-item-tile.component';
-import { prepLabOrderPostData } from '../api';
+import { RadiologyOrderBasketItemTile } from './radiology-order-basket-item-tile.component';
+import { prepRadiologyOrderPostData } from '../api';
 import LabIcon from './radiology-icon.component';
 import styles from './radiology-order-basket-panel.scss';
+import { type RadiologyOrderBasketItem } from '../../types';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
@@ -22,7 +22,7 @@ import styles from './radiology-order-basket-panel.scss';
 export default function RadiologyOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('labs', prepRadiologyOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -31,11 +31,11 @@ export default function RadiologyOrderBasketPanelExtension() {
     revisedOrderBasketItems,
     discontinuedOrderBasketItems,
   } = useMemo(() => {
-    const incompleteOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const newOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const renewedOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const revisedOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const discontinuedOrderBasketItems: Array<LabOrderBasketItem> = [];
+    const incompleteOrderBasketItems: Array<RadiologyOrderBasketItem> = [];
+    const newOrderBasketItems: Array<RadiologyOrderBasketItem> = [];
+    const renewedOrderBasketItems: Array<RadiologyOrderBasketItem> = [];
+    const revisedOrderBasketItems: Array<RadiologyOrderBasketItem> = [];
+    const discontinuedOrderBasketItems: Array<RadiologyOrderBasketItem> = [];
 
     orders.forEach((order) => {
       if (order?.isOrderIncomplete) {
@@ -75,7 +75,7 @@ export default function RadiologyOrderBasketPanelExtension() {
   }, []);
 
   const removeLabOrder = useCallback(
-    (order: LabOrderBasketItem) => {
+    (order: RadiologyOrderBasketItem) => {
       const newOrders = [...orders];
       newOrders.splice(orders.indexOf(order), 1);
       setOrders(newOrders);
@@ -128,7 +128,7 @@ export default function RadiologyOrderBasketPanelExtension() {
               {incompleteOrderBasketItems.length > 0 && (
                 <>
                   {incompleteOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -140,7 +140,7 @@ export default function RadiologyOrderBasketPanelExtension() {
               {newOrderBasketItems.length > 0 && (
                 <>
                   {newOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -153,7 +153,7 @@ export default function RadiologyOrderBasketPanelExtension() {
               {renewedOrderBasketItems.length > 0 && (
                 <>
                   {renewedOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -166,7 +166,7 @@ export default function RadiologyOrderBasketPanelExtension() {
               {revisedOrderBasketItems.length > 0 && (
                 <>
                   {revisedOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -179,7 +179,7 @@ export default function RadiologyOrderBasketPanelExtension() {
               {discontinuedOrderBasketItems.length > 0 && (
                 <>
                   {discontinuedOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}

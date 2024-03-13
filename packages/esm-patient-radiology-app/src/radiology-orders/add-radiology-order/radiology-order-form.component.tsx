@@ -1,19 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import {
-  type LabOrderBasketItem,
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   promptBeforeClosing,
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, prepLabOrderPostData, useOrderReasons } from '../api';
+import { careSettingUuid, prepRadiologyOrderPostData, useOrderReasons } from '../api';
 import {
   Button,
   ButtonSet,
   Column,
   ComboBox,
+  DatePicker,
+  DatePickerInput,
   Form,
   Layer,
   Grid,
@@ -30,9 +31,10 @@ import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './radiology-order-form.scss';
+import { type RadiologyOrderBasketItem } from '../../types';
 
-export interface LabOrderFormProps {
-  initialOrder: LabOrderBasketItem;
+export interface RadiologyOrderFormProps {
+  initialOrder: RadiologyOrderBasketItem;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
   closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
@@ -41,16 +43,16 @@ export interface LabOrderFormProps {
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({
+export function RadiologyOrderForm({
   initialOrder,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
-}: LabOrderFormProps) {
+}: RadiologyOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepLabOrderPostData);
+  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('labs', prepRadiologyOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
@@ -86,7 +88,7 @@ export function LabOrderForm({
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
-  } = useForm<LabOrderBasketItem>({
+  } = useForm<RadiologyOrderBasketItem>({
     mode: 'all',
     resolver: zodResolver(labOrderFormSchema),
     defaultValues: {
@@ -99,7 +101,7 @@ export function LabOrderForm({
   const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const handleFormSubmission = useCallback(
-    (data: LabOrderBasketItem) => {
+    (data: RadiologyOrderBasketItem) => {
       data.action = 'NEW';
       data.careSetting = careSettingUuid;
       data.orderer = session.currentProvider.uuid;
@@ -122,7 +124,7 @@ export function LabOrderForm({
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
-  const onError = (errors: FieldErrors<LabOrderBasketItem>) => {
+  const onError = (errors: FieldErrors<RadiologyOrderBasketItem>) => {
     if (errors) {
       setShowErrorNotification(true);
     }
@@ -215,6 +217,35 @@ export function LabOrderForm({
                   )}
                 />
               </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={4} sm={4}>
+              <div className={styles.fullWidthDatePickerContainer}>
+                <InputWrapper>
+                  <Controller
+                    name="scheduleDate"
+                    control={control}
+                    render={({ field: { onBlur, value, onChange, ref } }) => (
+                      <DatePicker
+                        datePickerType="single"
+                        maxDate={new Date().toISOString()}
+                        value={value}
+                        onChange={([newStartDate]) => onChange(newStartDate)}
+                        onBlur={onBlur}
+                        ref={ref}
+                      >
+                        <DatePickerInput
+                          id="startDatePicker"
+                          placeholder="mm/dd/yyyy"
+                          labelText={t('startDate', 'Start date')}
+                          size="lg"
+                        />
+                      </DatePicker>
+                    )}
+                  />
+                </InputWrapper>
+              </div>
             </Column>
           </Grid>
           {orderReasons.length > 0 && (

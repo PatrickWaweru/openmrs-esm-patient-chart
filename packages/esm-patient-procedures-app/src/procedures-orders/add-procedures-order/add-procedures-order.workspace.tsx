@@ -19,7 +19,9 @@ export interface AddProceduresOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
 }
 
-export interface AddProceduresOrderWorkspace extends DefaultWorkspaceProps, AddProceduresOrderWorkspaceAdditionalProps {}
+export interface AddProceduresOrderWorkspace
+  extends DefaultWorkspaceProps,
+    AddProceduresOrderWorkspaceAdditionalProps {}
 
 // Design: https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 export default function AddProceduresOrderWorkspace({

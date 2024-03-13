@@ -1,4 +1,5 @@
 import { type OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 
 export interface FhirResponse<T> {
   total: number;
@@ -131,4 +132,17 @@ export interface ObservationSet {
   type: string;
   uuid: string;
   meta: ConceptMeta;
+}
+
+export interface RadiologyOrderBasketItem extends OrderBasketItem {
+  testType?: {
+    label: string;
+    conceptUuid: string;
+  };
+  labReferenceNumber?: string;
+  urgency?: string;
+  instructions?: string;
+  previousOrder?: string;
+  orderReason?: string;
+  scheduleDate: Date | string;
 }
