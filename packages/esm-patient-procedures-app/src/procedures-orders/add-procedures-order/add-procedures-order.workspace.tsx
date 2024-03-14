@@ -9,11 +9,11 @@ import {
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   type OrderBasketItem,
-  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { TestTypeSearch } from './test-type-search';
 import { LabOrderForm } from './procedures-order-form.component';
 import styles from './add-procedures-order.scss';
+import { type ProceduresOrderBasketItem } from '../../types';
 
 export interface AddProceduresOrderWorkspaceAdditionalProps {
   order?: OrderBasketItem;
@@ -33,7 +33,7 @@ export default function AddProceduresOrderWorkspace({
   const { t } = useTranslation();
 
   const { patient, isLoading: isLoadingPatient } = usePatient();
-  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as LabOrderBasketItem);
+  const [currentLabOrder, setCurrentLabOrder] = useState(initialOrder as ProceduresOrderBasketItem);
 
   const isTablet = useLayoutType() === 'tablet';
 

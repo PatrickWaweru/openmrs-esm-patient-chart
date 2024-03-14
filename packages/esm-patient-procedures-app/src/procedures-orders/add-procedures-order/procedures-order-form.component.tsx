@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import {
-  type LabOrderBasketItem,
   type DefaultWorkspaceProps,
   launchPatientWorkspace,
   promptBeforeClosing,
@@ -14,25 +13,33 @@ import {
   ButtonSet,
   Column,
   ComboBox,
+  DatePicker,
+  DatePickerInput,
   Form,
+  FormLabel,
+  Toggle,
   Layer,
   Grid,
   InlineNotification,
   TextInput,
   TextArea,
+  Checkbox,
+  FormGroup,
+  NumberInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './procedures-order';
 import { useTestTypes } from './useTestTypes';
-import { Controller, type FieldErrors, useForm } from 'react-hook-form';
+import { type Control, Controller, type FieldErrors, useForm, useController } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './procedures-order-form.scss';
-
+import { type ProceduresOrderBasketItem } from '../../types';
+import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 export interface LabOrderFormProps {
-  initialOrder: LabOrderBasketItem;
+  initialOrder: ProceduresOrderBasketItem;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
   closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
   promptBeforeClosing: DefaultWorkspaceProps['promptBeforeClosing'];
@@ -50,14 +57,15 @@ export function LabOrderForm({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepProceduresOrderPostData);
+  const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
   ).required;
-  const labOrderFormSchema = z.object({
+
+  const proceduresOrderFormSchema = z.object({
     instructions: z.string().optional(),
     urgency: z.string().refine((value) => value !== '', {
       message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
@@ -80,26 +88,34 @@ export function LabOrderForm({
             translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
           )
       : z.string().optional(),
+    // scheduleDate: z.union([z.date(), z.string()]).optional(),
+    scheduleDate: z.date().optional(),
+    commentsToFulfiller: z.string().optional(),
+    laterality: z.string().optional(),
+    numberOfRepeats: z.number().optional(),
+    previousOrder: z.string().optional(),
   });
 
   const {
     control,
     handleSubmit,
     formState: { errors, defaultValues, isDirty },
-  } = useForm<LabOrderBasketItem>({
+  } = useForm<ProceduresOrderBasketItem>({
     mode: 'all',
-    resolver: zodResolver(labOrderFormSchema),
+    resolver: zodResolver(proceduresOrderFormSchema),
     defaultValues: {
       ...initialOrder,
     },
   });
+
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
+
   const { orderReasons } = useOrderReasons(orderReasonUuids);
 
   const handleFormSubmission = useCallback(
-    (data: LabOrderBasketItem) => {
+    (data: ProceduresOrderBasketItem) => {
       data.action = 'NEW';
       data.careSetting = careSettingUuid;
       data.orderer = session.currentProvider.uuid;
@@ -122,7 +138,7 @@ export function LabOrderForm({
     });
   }, [closeWorkspace, orders, setOrders, defaultValues]);
 
-  const onError = (errors: FieldErrors<LabOrderBasketItem>) => {
+  const onError = (errors: FieldErrors<ProceduresOrderBasketItem>) => {
     if (errors) {
       setShowErrorNotification(true);
     }
@@ -143,7 +159,7 @@ export function LabOrderForm({
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
         />
       )}
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
+      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="procedureOrderForm">
         <div className={styles.form}>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
@@ -173,28 +189,6 @@ export function LabOrderForm({
             </Column>
           </Grid>
           <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="labReferenceNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      size="lg"
-                      labelText={t('labReferenceNumber', 'Lab reference number')}
-                      maxLength={150}
-                      value={value}
-                      onChange={onChange}
-                      invalid={errors.labReferenceNumber?.message}
-                      invalidText={errors.labReferenceNumber?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>
                 <Controller
@@ -215,6 +209,35 @@ export function LabOrderForm({
                   )}
                 />
               </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={4} sm={4}>
+              <div className={styles.fullWidthDatePickerContainer}>
+                <InputWrapper>
+                  <Controller
+                    name="scheduleDate"
+                    control={control}
+                    render={({ field: { onBlur, value, onChange, ref } }) => (
+                      <DatePicker
+                        datePickerType="single"
+                        maxDate={new Date().toISOString()}
+                        value={value}
+                        onChange={([newStartDate]) => onChange(newStartDate)}
+                        onBlur={onBlur}
+                        ref={ref}
+                      >
+                        <DatePickerInput
+                          id="scheduleDatePicker"
+                          placeholder="mm/dd/yyyy"
+                          labelText={t('scheduleDate', 'Scheduled date')}
+                          size="lg"
+                        />
+                      </DatePicker>
+                    )}
+                  />
+                </InputWrapper>
+              </div>
             </Column>
           </Grid>
           {orderReasons.length > 0 && (
@@ -263,6 +286,68 @@ export function LabOrderForm({
                       invalidText={errors.instructions?.message}
                     />
                   )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="commentsToFulfiller"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="commentsToFulfillerInput"
+                      size="lg"
+                      labelText={t('commentsToFulfiller', 'Comments To Fulfiller')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="laterality"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="lateralityInput"
+                      size="lg"
+                      labelText={t('laterality', 'Laterality')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <NumberInput
+                  id="numberOfRepeats"
+                  label={t('numberOfRepeats', 'Number Of Repeats')}
+                  min={0}
+                  // onChange={(event) => field.onChange(parseInt(event.target.value || 0))}
+                  // value={field.value}
+                  hideSteppers={false}
                 />
               </InputWrapper>
             </Column>

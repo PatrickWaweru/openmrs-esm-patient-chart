@@ -144,5 +144,8 @@ export interface RadiologyOrderBasketItem extends OrderBasketItem {
   instructions?: string;
   previousOrder?: string;
   orderReason?: string;
-  scheduleDate: Date | string;
+  scheduleDate?: Date | string;
+  commentsToFulfiller?: string;
+  laterality?: string;
+  numberOfRepeats?: number;
 }

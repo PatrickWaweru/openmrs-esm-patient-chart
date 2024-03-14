@@ -2,8 +2,9 @@ import useSWR, { mutate } from 'swr';
 import { type FetchResponse, openmrsFetch, useConfig, restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import { type ConfigObject } from '../config-schema';
 import { useCallback, useMemo } from 'react';
-import type { OrderPost, PatientOrderFetchResponse, LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import type { OrderPost, PatientOrderFetchResponse } from '@openmrs/esm-patient-common-lib';
 import useSWRImmutable from 'swr/immutable';
+import { type ProceduresOrderBasketItem } from '../types';
 
 export const careSettingUuid = '6f0c9a92-6f24-11e3-af88-005056821db0';
 /**
@@ -71,7 +72,7 @@ export function useOrderReasons(conceptUuids: Array<string>) {
 }
 
 export function prepProceduresOrderPostData(
-  order: LabOrderBasketItem,
+  order: ProceduresOrderBasketItem,
   patientUuid: string,
   encounterUuid: string,
 ): OrderPost {
@@ -127,7 +128,7 @@ export function getConceptReferenceUrls(conceptUuids: Array<string>) {
 }
 
 export type PostDataPrepLabOrderFunction = (
-  order: LabOrderBasketItem,
+  order: ProceduresOrderBasketItem,
   patientUuid: string,
   encounterUuid: string,
 ) => OrderPost;

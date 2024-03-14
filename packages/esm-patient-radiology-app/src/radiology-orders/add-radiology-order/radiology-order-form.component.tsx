@@ -175,28 +175,6 @@ export function RadiologyOrderForm({
             </Column>
           </Grid>
           <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="labReferenceNumber"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                      id="labReferenceNumberInput"
-                      size="lg"
-                      labelText={t('labReferenceNumber', 'Lab reference number')}
-                      maxLength={150}
-                      value={value}
-                      onChange={onChange}
-                      invalid={errors.labReferenceNumber?.message}
-                      invalidText={errors.labReferenceNumber?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
             <Column lg={8} md={8} sm={4}>
               <InputWrapper>
                 <Controller
@@ -236,9 +214,9 @@ export function RadiologyOrderForm({
                         ref={ref}
                       >
                         <DatePickerInput
-                          id="startDatePicker"
+                          id="scheduleDatePicker"
                           placeholder="mm/dd/yyyy"
-                          labelText={t('startDate', 'Start date')}
+                          labelText={t('scheduleDate', 'Scheduled date')}
                           size="lg"
                         />
                       </DatePicker>
@@ -286,6 +264,54 @@ export function RadiologyOrderForm({
                       id="additionalInstructionsInput"
                       size="lg"
                       labelText={t('additionalInstructions', 'Additional instructions')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="commentsToFulfiller"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="commentsToFulfillerInput"
+                      size="lg"
+                      labelText={t('commentsToFulfiller', 'Comments To Fulfiller')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="laterality"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="lateralityInput"
+                      size="lg"
+                      labelText={t('laterality', 'Laterality')}
                       value={value}
                       onChange={onChange}
                       onBlur={onBlur}

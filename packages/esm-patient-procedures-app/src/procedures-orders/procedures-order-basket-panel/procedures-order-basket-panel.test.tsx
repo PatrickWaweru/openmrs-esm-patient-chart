@@ -2,7 +2,8 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ProceduresOrderBasketPanel from './procedures-order-basket-panel.extension';
-import { type LabOrderBasketItem, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ProceduresOrderBasketItem } from '../../types';
 
 const mockUseOrderBasket = jest.fn();
 
@@ -21,7 +22,7 @@ describe('ProceduresOrderBasketPanel: ', () => {
 
   test('renders a tile-based layout of lab orders', async () => {
     const user = userEvent.setup();
-    const labs: Array<LabOrderBasketItem> = [
+    const labs: Array<ProceduresOrderBasketItem> = [
       {
         action: 'NEW',
         testType: {

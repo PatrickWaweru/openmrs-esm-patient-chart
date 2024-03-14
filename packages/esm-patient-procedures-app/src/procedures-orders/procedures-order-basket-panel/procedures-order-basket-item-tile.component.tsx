@@ -5,15 +5,19 @@ import { Button, ClickableTile, Tile } from '@carbon/react';
 import { TrashCan, Warning } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './procedures-order-basket-item-tile.scss';
-import { type LabOrderBasketItem } from '@openmrs/esm-patient-common-lib';
+import { type ProceduresOrderBasketItem } from '../../types';
 
 export interface OrderBasketItemTileProps {
-  orderBasketItem: LabOrderBasketItem;
+  orderBasketItem: ProceduresOrderBasketItem;
   onItemClick: () => void;
   onRemoveClick: () => void;
 }
 
-export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveClick }: OrderBasketItemTileProps) {
+export function ProceduresOrderBasketItemTile({
+  orderBasketItem,
+  onItemClick,
+  onRemoveClick,
+}: OrderBasketItemTileProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
@@ -75,7 +79,7 @@ export function LabOrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveC
   );
 }
 
-function OrderActionLabel({ orderBasketItem }: { orderBasketItem: LabOrderBasketItem }) {
+function OrderActionLabel({ orderBasketItem }: { orderBasketItem: ProceduresOrderBasketItem }) {
   const { t } = useTranslation();
 
   if (orderBasketItem.isOrderIncomplete) {

@@ -4,19 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/react';
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
-import {
-  type LabOrderBasketItem,
-  closeWorkspace,
-  launchPatientWorkspace,
-  useOrderBasket,
-} from '@openmrs/esm-patient-common-lib';
+import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
 import { prepProceduresOrderPostData } from '../api';
 import { type TestType, useTestTypes } from './useTestTypes';
 import { createEmptyLabOrder } from './procedures-order';
 import styles from './test-type-search.scss';
+import { type ProceduresOrderBasketItem } from '../../types';
 
 export interface TestTypeSearchProps {
-  openLabForm: (searchResult: LabOrderBasketItem) => void;
+  openLabForm: (searchResult: ProceduresOrderBasketItem) => void;
 }
 
 export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
@@ -59,7 +55,7 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
 
 interface TestTypeSearchResultsProps {
   searchTerm: string;
-  openOrderForm: (searchResult: LabOrderBasketItem) => void;
+  openOrderForm: (searchResult: ProceduresOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
 }
 
@@ -137,13 +133,13 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
 
 interface TestTypeSearchResultItemProps {
   testType: TestType;
-  openOrderForm: (searchResult: LabOrderBasketItem) => void;
+  openOrderForm: (searchResult: ProceduresOrderBasketItem) => void;
 }
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ testType, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepProceduresOrderPostData);
+  const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
     [orders, testType],

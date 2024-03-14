@@ -9,12 +9,12 @@ import {
   type OrderBasketItem,
   useOrderBasket,
   closeWorkspace,
-  type LabOrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { LabOrderBasketItemTile } from './procedures-order-basket-item-tile.component';
+import { ProceduresOrderBasketItemTile } from './procedures-order-basket-item-tile.component';
 import { prepProceduresOrderPostData } from '../api';
 import LabIcon from './procedures-icon.component';
 import styles from './procedures-order-basket-panel.scss';
+import { type ProceduresOrderBasketItem } from '../../types';
 
 /**
  * Designs: https://app.zeplin.io/project/60d59321e8100b0324762e05/screen/648c44d9d4052c613e7f23da
@@ -22,7 +22,7 @@ import styles from './procedures-order-basket-panel.scss';
 export default function ProceduresOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<LabOrderBasketItem>('labs', prepProceduresOrderPostData);
+  const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,
@@ -31,11 +31,11 @@ export default function ProceduresOrderBasketPanelExtension() {
     revisedOrderBasketItems,
     discontinuedOrderBasketItems,
   } = useMemo(() => {
-    const incompleteOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const newOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const renewedOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const revisedOrderBasketItems: Array<LabOrderBasketItem> = [];
-    const discontinuedOrderBasketItems: Array<LabOrderBasketItem> = [];
+    const incompleteOrderBasketItems: Array<ProceduresOrderBasketItem> = [];
+    const newOrderBasketItems: Array<ProceduresOrderBasketItem> = [];
+    const renewedOrderBasketItems: Array<ProceduresOrderBasketItem> = [];
+    const revisedOrderBasketItems: Array<ProceduresOrderBasketItem> = [];
+    const discontinuedOrderBasketItems: Array<ProceduresOrderBasketItem> = [];
 
     orders.forEach((order) => {
       if (order?.isOrderIncomplete) {
@@ -75,7 +75,7 @@ export default function ProceduresOrderBasketPanelExtension() {
   }, []);
 
   const removeLabOrder = useCallback(
-    (order: LabOrderBasketItem) => {
+    (order: ProceduresOrderBasketItem) => {
       const newOrders = [...orders];
       newOrders.splice(orders.indexOf(order), 1);
       setOrders(newOrders);
@@ -128,7 +128,7 @@ export default function ProceduresOrderBasketPanelExtension() {
               {incompleteOrderBasketItems.length > 0 && (
                 <>
                   {incompleteOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -140,7 +140,7 @@ export default function ProceduresOrderBasketPanelExtension() {
               {newOrderBasketItems.length > 0 && (
                 <>
                   {newOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -153,7 +153,7 @@ export default function ProceduresOrderBasketPanelExtension() {
               {renewedOrderBasketItems.length > 0 && (
                 <>
                   {renewedOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -166,7 +166,7 @@ export default function ProceduresOrderBasketPanelExtension() {
               {revisedOrderBasketItems.length > 0 && (
                 <>
                   {revisedOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
@@ -179,7 +179,7 @@ export default function ProceduresOrderBasketPanelExtension() {
               {discontinuedOrderBasketItems.length > 0 && (
                 <>
                   {discontinuedOrderBasketItems.map((order) => (
-                    <LabOrderBasketItemTile
+                    <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
                       onItemClick={() => openEditLabForm(order)}
