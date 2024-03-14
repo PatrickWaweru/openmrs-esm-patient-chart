@@ -149,4 +149,20 @@ export interface ProceduresOrderBasketItem extends OrderBasketItem {
   commentsToFulfiller?: string;
   laterality?: string;
   numberOfRepeats?: number;
+  frequency?: string;
+  bodySite?: string;
+  specimenSource?: string;
+  specimenType?: string;
+}
+
+export type OrderFrequency = CommonProceduresValueCoded;
+export type DurationUnit = CommonProceduresValueCoded;
+
+interface CommonProceduresProps {
+  value: string;
+  default?: boolean;
+}
+
+export interface CommonProceduresValueCoded extends CommonProceduresProps {
+  valueCoded: string;
 }

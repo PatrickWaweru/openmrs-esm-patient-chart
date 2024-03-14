@@ -147,3 +147,93 @@ export interface ConceptResponse {
   answers: Array<ConceptAnswers>;
   setMembers: Array<ConceptAnswers>;
 }
+
+export interface OpenmrsObject {
+  uuid: string;
+}
+
+export type BaseOpenmrsObject = OpenmrsObject;
+
+export interface SessionPriviledge {
+  uuid: string;
+  name: string;
+}
+
+export interface Person {
+  uuid: string;
+  display: string;
+}
+
+export interface Role {
+  role: string;
+  display: string;
+}
+export interface User {
+  uuid: string;
+  display: string;
+  givenName: string;
+  familyName: string;
+  firstName: string;
+  lastName: string;
+  person?: Person;
+  roles?: Role[];
+  privileges: SessionPriviledge[];
+}
+export interface Auditable extends OpenmrsObject {
+  creator: User;
+  dateCreated: Date;
+  changedBy: User;
+  dateChanged: Date;
+}
+export interface Retireable extends OpenmrsObject {
+  retired: boolean;
+  dateRetired: Date;
+  retiredBy: User;
+  retireReason: string;
+}
+
+export interface ConceptName extends BaseOpenmrsObject {
+  conceptNameId: number;
+  concept: Concept;
+  name: string;
+  localePreferred: boolean;
+  short: boolean;
+  preferred: boolean;
+  indexTerm: boolean;
+  synonym: boolean;
+  fullySpecifiedName: boolean;
+}
+export interface Concept extends BaseOpenmrsObject, Auditable, Retireable {
+  conceptId: number;
+  display: string;
+  set: boolean;
+  version: string;
+  names: ConceptName[];
+  name: ConceptName;
+  numeric: boolean;
+  complex: boolean;
+  shortNames: ConceptName[];
+  indexTerms: ConceptName[];
+  synonyms: ConceptName[];
+  setMembers: Concept[];
+  possibleValues: Concept[];
+  preferredName: ConceptName;
+  shortName: ConceptName;
+  fullySpecifiedName: ConceptName;
+  answers: Concept[];
+}
+
+export function useConceptById(id: string) {
+  const apiUrl = `ws/rest/v1/concept/${id}`;
+  const { data, error, isLoading } = useSWR<
+    {
+      data: Concept;
+    },
+    Error
+  >(apiUrl, openmrsFetch);
+  return {
+    items: data?.data || <Concept>{},
+    isLoading,
+    isError: error,
+  };
+}

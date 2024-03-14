@@ -27,6 +27,7 @@ function openmrsFetchMultiple(urls: Array<string>) {
 }
 
 function useProceduresConceptsSWR(labOrderableConcepts?: Array<string>) {
+  console.warn('Here: ', labOrderableConcepts);
   const { data, isLoading, error } = useSWRImmutable(
     () =>
       labOrderableConcepts

@@ -148,4 +148,18 @@ export interface RadiologyOrderBasketItem extends OrderBasketItem {
   commentsToFulfiller?: string;
   laterality?: string;
   numberOfRepeats?: number;
+  frequency?: string;
+  bodySite?: string;
+}
+
+export type OrderFrequency = CommonRadiologyValueCoded;
+export type DurationUnit = CommonRadiologyValueCoded;
+
+interface CommonRadiologyProps {
+  value: string;
+  default?: boolean;
+}
+
+export interface CommonRadiologyValueCoded extends CommonRadiologyProps {
+  valueCoded: string;
 }

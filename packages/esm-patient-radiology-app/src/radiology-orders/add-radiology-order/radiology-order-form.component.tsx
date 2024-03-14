@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import classNames from 'classnames';
 import {
   type DefaultWorkspaceProps,
@@ -7,7 +7,7 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, prepRadiologyOrderPostData, useOrderReasons } from '../api';
+import { careSettingUuid, prepRadiologyOrderPostData, useOrderReasons, useConceptById } from '../api';
 import {
   Button,
   ButtonSet,
@@ -32,7 +32,8 @@ import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './radiology-order-form.scss';
-import { type RadiologyOrderBasketItem } from '../../types';
+import type { RadiologyOrderBasketItem, OrderFrequency } from '../../types';
+import { useOrderConfig } from '../order-config';
 
 export interface RadiologyOrderFormProps {
   initialOrder: RadiologyOrderBasketItem;
@@ -53,9 +54,20 @@ export function RadiologyOrderForm({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const { orderConfigObject, isLoading: isLoadingOrderConfig, error: errorFetchingOrderConfig } = useOrderConfig();
   const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('labs', prepRadiologyOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useRadiologyTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const {
+    items: { answers: lateralityItems },
+    isLoading: isLoadingLaterality,
+    isError: errorFetchingLaterality,
+  } = useConceptById('160594AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const {
+    items: { answers: bodySiteItems },
+    isLoading: isLoadingBodySiteItems,
+    isError: errorFetchingBodySiteItems,
+  } = useConceptById('162668AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   const config = useConfig<ConfigObject>();
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
@@ -96,6 +108,12 @@ export function RadiologyOrderForm({
       ...initialOrder,
     },
   });
+
+  const orderFrequencies: Array<OrderFrequency> = useMemo(
+    () => orderConfigObject?.orderFrequencies ?? [],
+    [orderConfigObject],
+  );
+
   const orderReasonUuids =
     (config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === defaultValues?.testType?.conceptUuid) || {})
       .orderReasons || [];
@@ -134,6 +152,17 @@ export function RadiologyOrderForm({
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
+
+  const [selectedPriority, setSelectedPriority] = useState('');
+  const [showScheduleDate, setShowScheduleDate] = useState(false);
+
+  const handlePriorityChange = (event) => {
+    const selectedValue = event.selectedItem ? event.selectedItem.label : '';
+    setSelectedPriority(selectedValue);
+    console.warn('Selected value is: ', selectedValue);
+    // Set the state to show the TextInput based on the selected option
+    setShowScheduleDate(selectedValue === 'Scheduled');
+  };
 
   return (
     <>
@@ -186,10 +215,12 @@ export function RadiologyOrderForm({
                       size="lg"
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      // selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      selectedItem={selectedPriority}
                       items={priorityOptions}
                       onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      // onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      onChange={handlePriorityChange}
                       invalid={errors.urgency?.message}
                       invalidText={errors.urgency?.message}
                     />
@@ -198,35 +229,37 @@ export function RadiologyOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={4} sm={4}>
-              <div className={styles.fullWidthDatePickerContainer}>
-                <InputWrapper>
-                  <Controller
-                    name="scheduleDate"
-                    control={control}
-                    render={({ field: { onBlur, value, onChange, ref } }) => (
-                      <DatePicker
-                        datePickerType="single"
-                        maxDate={new Date().toISOString()}
-                        value={value}
-                        onChange={([newStartDate]) => onChange(newStartDate)}
-                        onBlur={onBlur}
-                        ref={ref}
-                      >
-                        <DatePickerInput
-                          id="scheduleDatePicker"
-                          placeholder="mm/dd/yyyy"
-                          labelText={t('scheduleDate', 'Scheduled date')}
-                          size="lg"
-                        />
-                      </DatePicker>
-                    )}
-                  />
-                </InputWrapper>
-              </div>
-            </Column>
-          </Grid>
+          {showScheduleDate && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={4} sm={4}>
+                <div className={styles.fullWidthDatePickerContainer}>
+                  <InputWrapper>
+                    <Controller
+                      name="scheduleDate"
+                      control={control}
+                      render={({ field: { onBlur, value, onChange, ref } }) => (
+                        <DatePicker
+                          datePickerType="single"
+                          maxDate={new Date().toISOString()}
+                          value={value}
+                          onChange={([newStartDate]) => onChange(newStartDate)}
+                          onBlur={onBlur}
+                          ref={ref}
+                        >
+                          <DatePickerInput
+                            id="scheduleDatePicker"
+                            placeholder="mm/dd/yyyy"
+                            labelText={t('scheduleDate', 'Scheduled date')}
+                            size="lg"
+                          />
+                        </DatePicker>
+                      )}
+                    />
+                  </InputWrapper>
+                </div>
+              </Column>
+            </Grid>
+          )}
           {orderReasons.length > 0 && (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
@@ -308,17 +341,51 @@ export function RadiologyOrderForm({
                   name="laterality"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="lateralityInput"
+                    <ComboBox
                       size="lg"
-                      labelText={t('laterality', 'Laterality')}
-                      value={value}
-                      onChange={onChange}
+                      id="lateralityInput"
+                      titleText={t('laterality', 'Laterality')}
+                      // selectedItem={lateralityItems.find((option) => option.uuid === value) || null}
+                      items={lateralityItems}
                       onBlur={onBlur}
-                      maxCount={500}
-                      invalid={errors.instructions?.message}
-                      invalidText={errors.instructions?.message}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.laterality?.message}
+                      invalidText={errors.laterality?.message}
+                      itemToString={(item) => item?.display}
+                      disabled={isLoadingLaterality}
+                      placeholder={
+                        isLoadingOrderConfig ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
+                      }
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="bodySite"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="bodySiteInput"
+                      titleText={t('bodySite', 'Body Site')}
+                      // selectedItem={lateralityItems.find((option) => option.uuid === value) || null}
+                      items={bodySiteItems}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.laterality?.message}
+                      invalidText={errors.laterality?.message}
+                      itemToString={(item) => item?.display}
+                      disabled={isLoadingBodySiteItems}
+                      placeholder={
+                        isLoadingBodySiteItems
+                          ? `${t('loading', 'Loading')}...`
+                          : t('testTypePlaceholder', 'Select one')
+                      }
                     />
                   )}
                 />
@@ -335,6 +402,34 @@ export function RadiologyOrderForm({
                   // onChange={(event) => field.onChange(parseInt(event.target.value || 0))}
                   // value={field.value}
                   hideSteppers={false}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="frequency"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="frequencyInput"
+                      titleText={t('frequency', 'Frequency')}
+                      selectedItem={orderFrequencies.find((option) => option.value === value) || null}
+                      items={orderFrequencies}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.frequency?.message}
+                      invalidText={errors.frequency?.message}
+                      itemToString={(item) => item?.value}
+                      disabled={isLoadingOrderConfig}
+                      placeholder={
+                        isLoadingOrderConfig ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
+                      }
+                    />
+                  )}
                 />
               </InputWrapper>
             </Column>

@@ -7,7 +7,7 @@ import {
   useOrderBasket,
 } from '@openmrs/esm-patient-common-lib';
 import { translateFrom, useLayoutType, useSession, useConfig } from '@openmrs/esm-framework';
-import { careSettingUuid, prepProceduresOrderPostData, useOrderReasons } from '../api';
+import { careSettingUuid, prepProceduresOrderPostData, useOrderReasons, useConceptById, type Concept } from '../api';
 import {
   Button,
   ButtonSet,
@@ -36,8 +36,9 @@ import { z } from 'zod';
 import { moduleName } from '@openmrs/esm-patient-chart-app/src/constants';
 import { type ConfigObject } from '../../config-schema';
 import styles from './procedures-order-form.scss';
-import { type ProceduresOrderBasketItem } from '../../types';
+import type { ProceduresOrderBasketItem, OrderFrequency } from '../../types';
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
+import { useOrderConfig } from '../order-config';
 export interface LabOrderFormProps {
   initialOrder: ProceduresOrderBasketItem;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
@@ -57,9 +58,30 @@ export function LabOrderForm({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const { orderConfigObject, isLoading: isLoadingOrderConfig, error: errorFetchingOrderConfig } = useOrderConfig();
   const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useProceduresTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const {
+    items: { answers: lateralityItems },
+    isLoading: isLoadingLaterality,
+    isError: errorFetchingLaterality,
+  } = useConceptById('160594AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const {
+    items: { answers: bodySiteItems },
+    isLoading: isLoadingBodySiteItems,
+    isError: errorFetchingBodySiteItems,
+  } = useConceptById('162668AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const {
+    items: { answers: specimenSourceItems },
+    isLoading: isLoadingSpecimenSourceItems,
+    isError: errorFetchingSpecimenSourceItems,
+  } = useConceptById('159959AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const {
+    items: { setMembers: specimenTypeItems },
+    isLoading: isLoadingSpecimenTypeItems,
+    isError: errorFetchingSpecimenTypeItems,
+  } = useConceptById('162476AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
   const config = useConfig<ConfigObject>();
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
@@ -95,6 +117,11 @@ export function LabOrderForm({
     numberOfRepeats: z.number().optional(),
     previousOrder: z.string().optional(),
   });
+
+  const orderFrequencies: Array<OrderFrequency> = useMemo(
+    () => orderConfigObject?.orderFrequencies ?? [],
+    [orderConfigObject],
+  );
 
   const {
     control,
@@ -148,6 +175,17 @@ export function LabOrderForm({
     promptBeforeClosing(() => isDirty);
   }, [isDirty]);
 
+  const [selectedPriority, setSelectedPriority] = useState('');
+  const [showScheduleDate, setShowScheduleDate] = useState(false);
+
+  const handlePriorityChange = (event) => {
+    const selectedValue = event.selectedItem ? event.selectedItem.label : '';
+    setSelectedPriority(selectedValue);
+    console.warn('Selected value is: ', selectedValue);
+    // Set the state to show the TextInput based on the selected option
+    setShowScheduleDate(selectedValue === 'Scheduled');
+  };
+
   return (
     <>
       {errorLoadingTestTypes && (
@@ -199,10 +237,12 @@ export function LabOrderForm({
                       size="lg"
                       id="priorityInput"
                       titleText={t('priority', 'Priority')}
-                      selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      // selectedItem={priorityOptions.find((option) => option.value === value) || null}
+                      selectedItem={selectedPriority}
                       items={priorityOptions}
                       onBlur={onBlur}
-                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      // onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      onChange={handlePriorityChange}
                       invalid={errors.urgency?.message}
                       invalidText={errors.urgency?.message}
                     />
@@ -211,35 +251,37 @@ export function LabOrderForm({
               </InputWrapper>
             </Column>
           </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={4} sm={4}>
-              <div className={styles.fullWidthDatePickerContainer}>
-                <InputWrapper>
-                  <Controller
-                    name="scheduleDate"
-                    control={control}
-                    render={({ field: { onBlur, value, onChange, ref } }) => (
-                      <DatePicker
-                        datePickerType="single"
-                        maxDate={new Date().toISOString()}
-                        value={value}
-                        onChange={([newStartDate]) => onChange(newStartDate)}
-                        onBlur={onBlur}
-                        ref={ref}
-                      >
-                        <DatePickerInput
-                          id="scheduleDatePicker"
-                          placeholder="mm/dd/yyyy"
-                          labelText={t('scheduleDate', 'Scheduled date')}
-                          size="lg"
-                        />
-                      </DatePicker>
-                    )}
-                  />
-                </InputWrapper>
-              </div>
-            </Column>
-          </Grid>
+          {showScheduleDate && (
+            <Grid className={styles.gridRow}>
+              <Column lg={16} md={4} sm={4}>
+                <div className={styles.fullWidthDatePickerContainer}>
+                  <InputWrapper>
+                    <Controller
+                      name="scheduleDate"
+                      control={control}
+                      render={({ field: { onBlur, value, onChange, ref } }) => (
+                        <DatePicker
+                          datePickerType="single"
+                          maxDate={new Date().toISOString()}
+                          value={value}
+                          onChange={([newStartDate]) => onChange(newStartDate)}
+                          onBlur={onBlur}
+                          ref={ref}
+                        >
+                          <DatePickerInput
+                            id="scheduleDatePicker"
+                            placeholder="mm/dd/yyyy"
+                            labelText={t('scheduleDate', 'Scheduled date')}
+                            size="lg"
+                          />
+                        </DatePicker>
+                      )}
+                    />
+                  </InputWrapper>
+                </div>
+              </Column>
+            </Grid>
+          )}
           {orderReasons.length > 0 && (
             <Grid className={styles.gridRow}>
               <Column lg={16} md={8} sm={4}>
@@ -321,17 +363,112 @@ export function LabOrderForm({
                   name="laterality"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="lateralityInput"
+                    <ComboBox
                       size="lg"
-                      labelText={t('laterality', 'Laterality')}
-                      value={value}
-                      onChange={onChange}
+                      id="lateralityInput"
+                      titleText={t('laterality', 'Laterality')}
+                      // selectedItem={lateralityItems.find((option) => option.uuid === value) || null}
+                      items={lateralityItems}
                       onBlur={onBlur}
-                      maxCount={500}
-                      invalid={errors.instructions?.message}
-                      invalidText={errors.instructions?.message}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.laterality?.message}
+                      invalidText={errors.laterality?.message}
+                      itemToString={(item) => item?.display}
+                      disabled={isLoadingLaterality}
+                      placeholder={
+                        isLoadingOrderConfig ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
+                      }
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="bodySite"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="bodySiteInput"
+                      titleText={t('bodySite', 'Body Site')}
+                      // selectedItem={lateralityItems.find((option) => option.uuid === value) || null}
+                      items={bodySiteItems}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.laterality?.message}
+                      invalidText={errors.laterality?.message}
+                      itemToString={(item) => item?.display}
+                      disabled={isLoadingBodySiteItems}
+                      placeholder={
+                        isLoadingBodySiteItems
+                          ? `${t('loading', 'Loading')}...`
+                          : t('testTypePlaceholder', 'Select one')
+                      }
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="specimenSource"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="specimenSourceInput"
+                      titleText={t('specimenSource', 'Specimen Source')}
+                      // selectedItem={lateralityItems.find((option) => option.uuid === value) || null}
+                      items={specimenSourceItems}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.laterality?.message}
+                      invalidText={errors.laterality?.message}
+                      itemToString={(item) => item?.display}
+                      disabled={isLoadingSpecimenSourceItems}
+                      placeholder={
+                        isLoadingSpecimenSourceItems
+                          ? `${t('loading', 'Loading')}...`
+                          : t('testTypePlaceholder', 'Select one')
+                      }
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="specimenType"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="specimenTypeInput"
+                      titleText={t('specimenType', 'Specimen Type')}
+                      // selectedItem={lateralityItems.find((option) => option.uuid === value) || null}
+                      items={specimenTypeItems}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.specimenType?.message}
+                      invalidText={errors.specimenType?.message}
+                      // itemToString={(item) => item?.display}
+                      itemToString={(item?: Concept) => (item && item?.display ? `${item?.display}` : '')}
+                      disabled={isLoadingSpecimenTypeItems}
+                      placeholder={
+                        isLoadingSpecimenTypeItems
+                          ? `${t('loading', 'Loading')}...`
+                          : t('testTypePlaceholder', 'Select one')
+                      }
                     />
                   )}
                 />
@@ -348,6 +485,34 @@ export function LabOrderForm({
                   // onChange={(event) => field.onChange(parseInt(event.target.value || 0))}
                   // value={field.value}
                   hideSteppers={false}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="frequency"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <ComboBox
+                      size="lg"
+                      id="frequencyInput"
+                      titleText={t('frequency', 'Frequency')}
+                      selectedItem={orderFrequencies.find((option) => option.value === value) || null}
+                      items={orderFrequencies}
+                      onBlur={onBlur}
+                      onChange={({ selectedItem }) => onChange(selectedItem?.value || '')}
+                      invalid={errors.frequency?.message}
+                      invalidText={errors.frequency?.message}
+                      itemToString={(item) => item?.value}
+                      disabled={isLoadingOrderConfig}
+                      placeholder={
+                        isLoadingOrderConfig ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
+                      }
+                    />
+                  )}
                 />
               </InputWrapper>
             </Column>

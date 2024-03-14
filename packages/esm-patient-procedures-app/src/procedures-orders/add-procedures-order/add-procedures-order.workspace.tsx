@@ -30,6 +30,7 @@ export default function AddProceduresOrderWorkspace({
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
 }: AddProceduresOrderWorkspace) {
+  console.warn('Hey: We got here');
   const { t } = useTranslation();
 
   const { patient, isLoading: isLoadingPatient } = usePatient();
@@ -48,6 +49,7 @@ export default function AddProceduresOrderWorkspace({
 
   return (
     <div className={styles.container}>
+      <p>Test 3</p>
       {isTablet && !isLoadingPatient && (
         <div className={styles.patientHeader}>
           <span className={styles.bodyShort02}>{patientName}</span>
@@ -71,14 +73,20 @@ export default function AddProceduresOrderWorkspace({
         </div>
       )}
       {!currentLabOrder ? (
-        <TestTypeSearch openLabForm={setCurrentLabOrder} />
+        <div>
+          <p>Test 1</p>
+          <TestTypeSearch openLabForm={setCurrentLabOrder} />
+        </div>
       ) : (
-        <LabOrderForm
-          initialOrder={currentLabOrder}
-          closeWorkspace={closeWorkspace}
-          closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
-          promptBeforeClosing={promptBeforeClosing}
-        />
+        <div>
+          <p>Test 2</p>
+          <LabOrderForm
+            initialOrder={currentLabOrder}
+            closeWorkspace={closeWorkspace}
+            closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
+            promptBeforeClosing={promptBeforeClosing}
+          />
+        </div>
       )}
     </div>
   );
