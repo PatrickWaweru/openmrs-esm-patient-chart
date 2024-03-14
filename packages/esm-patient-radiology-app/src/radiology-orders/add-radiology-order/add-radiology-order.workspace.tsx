@@ -10,7 +10,7 @@ import {
   launchPatientWorkspace,
   type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { TestTypeSearch } from './test-type-search';
+import { TestTypeSearch } from './radiology-type-search';
 import { RadiologyOrderForm } from './radiology-order-form.component';
 import styles from './add-radiology-order.scss';
 import { type RadiologyOrderBasketItem } from '../../types';

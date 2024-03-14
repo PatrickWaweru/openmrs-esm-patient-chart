@@ -29,7 +29,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './procedures-order';
-import { useTestTypes } from './useTestTypes';
+import { useProceduresTypes } from './useProceduresTypes';
 import { type Control, Controller, type FieldErrors, useForm, useController } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -58,7 +58,7 @@ export function LabOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
-  const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
+  const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useProceduresTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const orderReasonRequired = (

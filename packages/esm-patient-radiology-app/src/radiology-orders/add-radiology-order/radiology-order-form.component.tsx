@@ -21,10 +21,11 @@ import {
   InlineNotification,
   TextInput,
   TextArea,
+  NumberInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { priorityOptions } from './radiology-order';
-import { useTestTypes } from './useTestTypes';
+import { useRadiologyTypes } from './useRadiologyTypes';
 import { Controller, type FieldErrors, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -53,7 +54,7 @@ export function RadiologyOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('labs', prepRadiologyOrderPostData);
-  const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useTestTypes();
+  const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useRadiologyTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const config = useConfig<ConfigObject>();
   const orderReasonRequired = (
@@ -320,6 +321,20 @@ export function RadiologyOrderForm({
                       invalidText={errors.instructions?.message}
                     />
                   )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <NumberInput
+                  id="numberOfRepeats"
+                  label={t('numberOfRepeats', 'Number Of Repeats')}
+                  min={0}
+                  // onChange={(event) => field.onChange(parseInt(event.target.value || 0))}
+                  // value={field.value}
+                  hideSteppers={false}
                 />
               </InputWrapper>
             </Column>

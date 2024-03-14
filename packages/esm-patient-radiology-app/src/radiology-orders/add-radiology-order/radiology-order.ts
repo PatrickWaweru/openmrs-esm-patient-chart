@@ -1,5 +1,5 @@
 import { type RadiologyOrderBasketItem } from '../../types';
-import { type TestType } from './useTestTypes';
+import { type TestType } from './useRadiologyTypes';
 
 // See the Urgency enum in https://github.com/openmrs/openmrs-core/blob/492dcd35b85d48730bd19da48f6db146cc882c22/api/src/main/java/org/openmrs/Order.java
 export const priorityOptions = [

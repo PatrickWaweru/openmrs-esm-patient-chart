@@ -8,13 +8,13 @@ import { type ConfigObject } from '../../config-schema';
 type ConceptResult = FetchResponse<Concept>;
 type ConceptResults = FetchResponse<{ results: Array<Concept> }>;
 
-export interface TestType {
+export interface RadiologyType {
   label: string;
   conceptUuid: string;
 }
 
-export interface UseTestType {
-  testTypes: Array<TestType>;
+export interface UseRadiologyType {
+  testTypes: Array<RadiologyType>;
   isLoading: boolean;
   error: Error;
 }
@@ -26,12 +26,12 @@ function openmrsFetchMultiple(urls: Array<string>) {
   return Promise.all(urls.map((url) => openmrsFetch<{ results: Array<Concept> }>(url)));
 }
 
-function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
+function useRadiologyConceptsSWR(labOrderableConcepts?: Array<string>) {
   const { data, isLoading, error } = useSWRImmutable(
     () =>
       labOrderableConcepts
         ? labOrderableConcepts.map((c) => `${restBaseUrl}/concept/${c}`)
-        : `${restBaseUrl}/concept?class=Test`,
+        : `${restBaseUrl}/concept?s=byConceptClass&conceptClass=8caa332c-efe4-4025-8b18-3398328e1323`,
     (labOrderableConcepts ? openmrsFetchMultiple : openmrsFetch) as any,
     {
       shouldRetryOnError(err) {
@@ -54,10 +54,10 @@ function useTestConceptsSWR(labOrderableConcepts?: Array<string>) {
   };
 }
 
-export function useTestTypes(searchTerm: string = ''): UseTestType {
+export function useRadiologyTypes(searchTerm: string = ''): UseRadiologyType {
   const { labOrderableConcepts } = useConfig<ConfigObject>().orders;
 
-  const { data, isLoading, error } = useTestConceptsSWR(labOrderableConcepts.length ? labOrderableConcepts : null);
+  const { data, isLoading, error } = useRadiologyConceptsSWR(labOrderableConcepts.length ? labOrderableConcepts : null);
 
   useEffect(() => {
     if (error) {

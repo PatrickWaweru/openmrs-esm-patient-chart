@@ -10,7 +10,7 @@ import {
   launchPatientWorkspace,
   type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
-import { TestTypeSearch } from './test-type-search';
+import { TestTypeSearch } from './procedures-type-search';
 import { LabOrderForm } from './procedures-order-form.component';
 import styles from './add-procedures-order.scss';
 import { type ProceduresOrderBasketItem } from '../../types';

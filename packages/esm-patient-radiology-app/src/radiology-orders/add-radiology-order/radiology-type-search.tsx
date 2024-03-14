@@ -5,14 +5,14 @@ import { Button, ButtonSkeleton, Search, SkeletonText, Tile } from '@carbon/reac
 import { ArrowRight, ShoppingCartArrowDown, ShoppingCartArrowUp } from '@carbon/react/icons';
 import { useDebounce, useLayoutType, useSession, ResponsiveWrapper } from '@openmrs/esm-framework';
 import { closeWorkspace, launchPatientWorkspace, useOrderBasket } from '@openmrs/esm-patient-common-lib';
-import { prepProceduresOrderPostData } from '../api';
-import { type TestType, useTestTypes } from './useTestTypes';
-import { createEmptyLabOrder } from './procedures-order';
-import styles from './test-type-search.scss';
-import { type ProceduresOrderBasketItem } from '../../types';
+import { prepRadiologyOrderPostData } from '../api';
+import { type RadiologyType, useRadiologyTypes } from './useRadiologyTypes';
+import { createEmptyLabOrder } from './radiology-order';
+import styles from './radiology-type-search.scss';
+import { type RadiologyOrderBasketItem } from '../../types';
 
 export interface TestTypeSearchProps {
-  openLabForm: (searchResult: ProceduresOrderBasketItem) => void;
+  openLabForm: (searchResult: RadiologyOrderBasketItem) => void;
 }
 
 export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
@@ -55,14 +55,14 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
 
 interface TestTypeSearchResultsProps {
   searchTerm: string;
-  openOrderForm: (searchResult: ProceduresOrderBasketItem) => void;
+  openOrderForm: (searchResult: RadiologyOrderBasketItem) => void;
   focusAndClearSearchInput: () => void;
 }
 
 function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchInput }: TestTypeSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { testTypes, isLoading, error } = useTestTypes(searchTerm);
+  const { testTypes, isLoading, error } = useRadiologyTypes(searchTerm);
 
   if (isLoading) {
     return <TestTypeSearchSkeleton />;
@@ -132,21 +132,21 @@ function TestTypeSearchResults({ searchTerm, openOrderForm, focusAndClearSearchI
 }
 
 interface TestTypeSearchResultItemProps {
-  testType: TestType;
-  openOrderForm: (searchResult: ProceduresOrderBasketItem) => void;
+  testType: RadiologyType;
+  openOrderForm: (searchResult: RadiologyOrderBasketItem) => void;
 }
 
 const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ testType, openOrderForm }) => {
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
+  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('radiology', prepRadiologyOrderPostData);
   const testTypeAlreadyInBasket = useMemo(
     () => orders?.some((order) => order.testType.conceptUuid === testType.conceptUuid),
     [orders, testType],
   );
 
   const createLabOrder = useCallback(
-    (testType: TestType) => {
+    (testType: RadiologyType) => {
       return createEmptyLabOrder(testType, session.currentProvider.uuid);
     },
     [session.currentProvider.uuid],
@@ -158,7 +158,7 @@ const TestTypeSearchResultItem: React.FC<TestTypeSearchResultItemProps> = ({ tes
     const labOrder = createLabOrder(testType);
     labOrder.isOrderIncomplete = true;
     setOrders([...orders, labOrder]);
-    closeWorkspace('add-procedures-order', {
+    closeWorkspace('add-radiology-order', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('order-basket'),
     });
