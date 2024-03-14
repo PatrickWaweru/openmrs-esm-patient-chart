@@ -37,8 +37,8 @@ export function TestTypeSearch({ openLabForm }: TestTypeSearchProps) {
         <Search
           autoFocus
           size="lg"
-          placeholder={t('searchFieldPlaceholder', 'Search for a test type')}
-          labelText={t('searchFieldPlaceholder', 'Search for a test type')}
+          placeholder={t('searchFieldPlaceholder', 'Search for a radiology test')}
+          labelText={t('searchFieldPlaceholder', 'Search for a radiology test')}
           onChange={handleSearchTermChange}
           ref={searchInputRef}
           value={searchTerm}

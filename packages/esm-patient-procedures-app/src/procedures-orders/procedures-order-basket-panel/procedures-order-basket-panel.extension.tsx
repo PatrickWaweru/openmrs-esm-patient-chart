@@ -60,14 +60,14 @@ export default function ProceduresOrderBasketPanelExtension() {
     };
   }, [orders]);
 
-  const openNewLabForm = useCallback(() => {
+  const openNewProceduresForm = useCallback(() => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-procedures-order'),
     });
   }, []);
 
-  const openEditLabForm = useCallback((order: OrderBasketItem) => {
+  const openEditProceduresForm = useCallback((order: OrderBasketItem) => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-procedures-order', { order }),
@@ -101,7 +101,7 @@ export default function ProceduresOrderBasketPanelExtension() {
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add procedures order"
-            onClick={openNewLabForm}
+            onClick={openNewProceduresForm}
             size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
@@ -131,7 +131,7 @@ export default function ProceduresOrderBasketPanelExtension() {
                     <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditProceduresForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -143,7 +143,7 @@ export default function ProceduresOrderBasketPanelExtension() {
                     <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditProceduresForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -156,7 +156,7 @@ export default function ProceduresOrderBasketPanelExtension() {
                     <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditProceduresForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -169,7 +169,7 @@ export default function ProceduresOrderBasketPanelExtension() {
                     <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditProceduresForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -182,7 +182,7 @@ export default function ProceduresOrderBasketPanelExtension() {
                     <ProceduresOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditProceduresForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}

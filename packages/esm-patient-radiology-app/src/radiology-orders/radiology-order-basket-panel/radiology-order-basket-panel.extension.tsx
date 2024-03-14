@@ -60,14 +60,14 @@ export default function RadiologyOrderBasketPanelExtension() {
     };
   }, [orders]);
 
-  const openNewLabForm = useCallback(() => {
+  const openNewRadiologyForm = useCallback(() => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-radiology-order'),
     });
   }, []);
 
-  const openEditLabForm = useCallback((order: OrderBasketItem) => {
+  const openEditRadiologyForm = useCallback((order: OrderBasketItem) => {
     closeWorkspace('order-basket', {
       ignoreChanges: true,
       onWorkspaceClose: () => launchPatientWorkspace('add-radiology-order', { order }),
@@ -101,7 +101,7 @@ export default function RadiologyOrderBasketPanelExtension() {
             kind="ghost"
             renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add radiology order"
-            onClick={openNewLabForm}
+            onClick={openNewRadiologyForm}
             size={isTablet ? 'md' : 'sm'}
           >
             {t('add', 'Add')}
@@ -131,7 +131,7 @@ export default function RadiologyOrderBasketPanelExtension() {
                     <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditRadiologyForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -143,7 +143,7 @@ export default function RadiologyOrderBasketPanelExtension() {
                     <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditRadiologyForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -156,7 +156,7 @@ export default function RadiologyOrderBasketPanelExtension() {
                     <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditRadiologyForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -169,7 +169,7 @@ export default function RadiologyOrderBasketPanelExtension() {
                     <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditRadiologyForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}
@@ -182,7 +182,7 @@ export default function RadiologyOrderBasketPanelExtension() {
                     <RadiologyOrderBasketItemTile
                       key={order.uuid}
                       orderBasketItem={order}
-                      onItemClick={() => openEditLabForm(order)}
+                      onItemClick={() => openEditRadiologyForm(order)}
                       onRemoveClick={() => removeLabOrder(order)}
                     />
                   ))}

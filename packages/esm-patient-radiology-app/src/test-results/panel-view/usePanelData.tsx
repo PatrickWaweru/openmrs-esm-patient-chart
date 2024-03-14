@@ -83,7 +83,12 @@ function useConcepts(conceptUuids: Array<string>) {
     const concepts: Array<Concept> = data ? [].concat(data?.map((resp) => resp.data)) : null;
     return {
       concepts: concepts
-        ? concepts.filter((c) => c.conceptClass.display === 'Test' || c.conceptClass.display === 'LabSet')
+        ? concepts.filter(
+            (c) =>
+              c.conceptClass.display === 'Test' ||
+              c.conceptClass.display === 'LabSet' ||
+              c.conceptClass.display === 'Radiology/Imaging Procedure',
+          )
         : null,
       // If there are no observations, hence no concept UUIDS, then it should return isLoading as false
       isLoading: conceptUuids?.length === 0 ? false : isLoading,

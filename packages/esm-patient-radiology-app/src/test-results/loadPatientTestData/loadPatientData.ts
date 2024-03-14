@@ -52,7 +52,12 @@ async function reloadData(patientUuid: string) {
   const entries = await loadObsEntries(patientUuid);
   const allConcepts = await loadPresentConcepts(entries);
 
-  const testConcepts = allConcepts.filter((x) => x.conceptClass.name === 'Radiology/Imaging Procedure');
+  const testConcepts = allConcepts.filter(
+    (x) =>
+      x.conceptClass.name === 'Test' ||
+      x.conceptClass.name === 'LabSet' ||
+      x.conceptClass.name === 'Radiology/Imaging Procedure',
+  );
   const testConceptUuids: ConceptUuid[] = testConcepts.map((x) => x.uuid);
   const testConceptNameMap: Record<ConceptUuid, string> = Object.fromEntries(
     testConcepts.map(({ uuid, display }) => [uuid, display]),
