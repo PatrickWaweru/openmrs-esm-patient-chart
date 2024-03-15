@@ -59,7 +59,7 @@ export function LabOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orderConfigObject, isLoading: isLoadingOrderConfig, error: errorFetchingOrderConfig } = useOrderConfig();
-  const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('labs', prepProceduresOrderPostData);
+  const { orders, setOrders } = useOrderBasket<ProceduresOrderBasketItem>('procedures', prepProceduresOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useProceduresTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const {
@@ -312,54 +312,6 @@ export function LabOrderForm({
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <Controller
-                  name="instructions"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="additionalInstructionsInput"
-                      size="lg"
-                      labelText={t('additionalInstructions', 'Additional instructions')}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      maxCount={500}
-                      invalid={errors.instructions?.message}
-                      invalidText={errors.instructions?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="commentsToFulfiller"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="commentsToFulfillerInput"
-                      size="lg"
-                      labelText={t('commentsToFulfiller', 'Comments To Fulfiller')}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      maxCount={500}
-                      invalid={errors.instructions?.message}
-                      invalidText={errors.instructions?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
                   name="laterality"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
@@ -511,6 +463,54 @@ export function LabOrderForm({
                       placeholder={
                         isLoadingOrderConfig ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
                       }
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="instructions"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="additionalInstructionsInput"
+                      size="lg"
+                      labelText={t('additionalInstructions', 'Additional instructions')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="commentsToFulfiller"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="commentsToFulfillerInput"
+                      size="lg"
+                      labelText={t('commentsToFulfiller', 'Comments To Fulfiller')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.commentsToFulfiller?.message}
+                      invalidText={errors.commentsToFulfiller?.message}
                     />
                   )}
                 />

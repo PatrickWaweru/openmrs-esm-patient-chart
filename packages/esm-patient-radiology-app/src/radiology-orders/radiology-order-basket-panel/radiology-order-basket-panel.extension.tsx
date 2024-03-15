@@ -22,7 +22,7 @@ import { type RadiologyOrderBasketItem } from '../../types';
 export default function RadiologyOrderBasketPanelExtension() {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('labs', prepRadiologyOrderPostData);
+  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('radiology', prepRadiologyOrderPostData);
   const [isExpanded, setIsExpanded] = useState(orders.length > 0);
   const {
     incompleteOrderBasketItems,

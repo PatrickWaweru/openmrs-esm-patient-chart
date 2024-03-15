@@ -71,11 +71,20 @@ export function useOrderReasons(conceptUuids: Array<string>) {
   return { orderReasons: orderReasons, isLoading };
 }
 
+export interface RadiologyOrderPost extends OrderPost {
+  scheduleDate?: Date | string;
+  commentsToFulfiller?: string;
+  laterality?: string;
+  numberOfRepeats?: number;
+  frequency?: string;
+  bodySite?: string;
+}
+
 export function prepRadiologyOrderPostData(
   order: RadiologyOrderBasketItem,
   patientUuid: string,
   encounterUuid: string,
-): OrderPost {
+): RadiologyOrderPost {
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
@@ -87,6 +96,12 @@ export function prepRadiologyOrderPostData(
       concept: order.testType.conceptUuid,
       instructions: order.instructions,
       orderReason: order.orderReason,
+      scheduleDate: order.scheduleDate,
+      commentsToFulfiller: order.commentsToFulfiller,
+      laterality: order.laterality,
+      numberOfRepeats: order.numberOfRepeats,
+      frequency: order.frequency,
+      bodySite: order.bodySite,
     };
   } else if (order.action === 'REVISE') {
     return {
@@ -100,6 +115,12 @@ export function prepRadiologyOrderPostData(
       instructions: order.instructions,
       orderReason: order.orderReason,
       previousOrder: order.previousOrder,
+      scheduleDate: order.scheduleDate,
+      commentsToFulfiller: order.commentsToFulfiller,
+      laterality: order.laterality,
+      numberOfRepeats: order.numberOfRepeats,
+      frequency: order.frequency,
+      bodySite: order.bodySite,
     };
   } else if (order.action === 'DISCONTINUE') {
     return {
@@ -112,6 +133,12 @@ export function prepRadiologyOrderPostData(
       concept: order.testType.conceptUuid,
       orderReason: order.orderReason,
       previousOrder: order.previousOrder,
+      scheduleDate: order.scheduleDate,
+      commentsToFulfiller: order.commentsToFulfiller,
+      laterality: order.laterality,
+      numberOfRepeats: order.numberOfRepeats,
+      frequency: order.frequency,
+      bodySite: order.bodySite,
     };
   } else {
     throw new Error(`Unknown order action: ${order.action}.`);

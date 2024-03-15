@@ -16,7 +16,7 @@ import styles from './add-radiology-order.scss';
 import { type RadiologyOrderBasketItem } from '../../types';
 
 export interface AddRadiologyOrderWorkspaceAdditionalProps {
-  order?: OrderBasketItem;
+  order?: RadiologyOrderBasketItem;
 }
 
 export interface AddRadiologyOrderWorkspace extends DefaultWorkspaceProps, AddRadiologyOrderWorkspaceAdditionalProps {}

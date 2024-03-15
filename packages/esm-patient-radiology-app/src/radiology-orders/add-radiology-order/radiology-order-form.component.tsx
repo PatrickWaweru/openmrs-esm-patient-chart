@@ -55,7 +55,7 @@ export function RadiologyOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { orderConfigObject, isLoading: isLoadingOrderConfig, error: errorFetchingOrderConfig } = useOrderConfig();
-  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('labs', prepRadiologyOrderPostData);
+  const { orders, setOrders } = useOrderBasket<RadiologyOrderBasketItem>('radiology', prepRadiologyOrderPostData);
   const { testTypes, isLoading: isLoadingTestTypes, error: errorLoadingTestTypes } = useRadiologyTypes();
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const {
@@ -72,7 +72,8 @@ export function RadiologyOrderForm({
   const orderReasonRequired = (
     config.labTestsWithOrderReasons?.find((c) => c.labTestUuid === initialOrder?.testType?.conceptUuid) || {}
   ).required;
-  const labOrderFormSchema = z.object({
+
+  const radiologyOrderFormSchema = z.object({
     instructions: z.string().optional(),
     urgency: z.string().refine((value) => value !== '', {
       message: translateFrom(moduleName, 'addLabOrderPriorityRequired', 'Priority is required'),
@@ -95,6 +96,13 @@ export function RadiologyOrderForm({
             translateFrom(moduleName, 'addLabOrderLabOrderReasonRequired', 'Order reason is required'),
           )
       : z.string().optional(),
+    previousOrder: z.string().optional(),
+    scheduleDate: z.union([z.string(), z.date()]),
+    commentsToFulfiller: z.string().optional(),
+    laterality: z.string().optional(),
+    numberOfRepeats: z.number().optional(),
+    frequency: z.string().optional(),
+    bodySite: z.string().optional(),
   });
 
   const {
@@ -103,7 +111,7 @@ export function RadiologyOrderForm({
     formState: { errors, defaultValues, isDirty },
   } = useForm<RadiologyOrderBasketItem>({
     mode: 'all',
-    resolver: zodResolver(labOrderFormSchema),
+    resolver: zodResolver(radiologyOrderFormSchema),
     defaultValues: {
       ...initialOrder,
     },
@@ -175,7 +183,7 @@ export function RadiologyOrderForm({
           subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
         />
       )}
-      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="drugOrderForm">
+      <Form className={styles.orderForm} onSubmit={handleSubmit(handleFormSubmission, onError)} id="radiologyOrderForm">
         <div className={styles.form}>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={8} sm={4}>
@@ -290,54 +298,6 @@ export function RadiologyOrderForm({
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <Controller
-                  name="instructions"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="additionalInstructionsInput"
-                      size="lg"
-                      labelText={t('additionalInstructions', 'Additional instructions')}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      maxCount={500}
-                      invalid={errors.instructions?.message}
-                      invalidText={errors.instructions?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
-                  name="commentsToFulfiller"
-                  control={control}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <TextArea
-                      enableCounter
-                      id="commentsToFulfillerInput"
-                      size="lg"
-                      labelText={t('commentsToFulfiller', 'Comments To Fulfiller')}
-                      value={value}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      maxCount={500}
-                      invalid={errors.instructions?.message}
-                      invalidText={errors.instructions?.message}
-                    />
-                  )}
-                />
-              </InputWrapper>
-            </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
-              <InputWrapper>
-                <Controller
                   name="laterality"
                   control={control}
                   render={({ field: { onChange, onBlur, value } }) => (
@@ -428,6 +388,54 @@ export function RadiologyOrderForm({
                       placeholder={
                         isLoadingOrderConfig ? `${t('loading', 'Loading')}...` : t('testTypePlaceholder', 'Select one')
                       }
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="instructions"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="additionalInstructionsInput"
+                      size="lg"
+                      labelText={t('additionalInstructions', 'Additional instructions')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.instructions?.message}
+                      invalidText={errors.instructions?.message}
+                    />
+                  )}
+                />
+              </InputWrapper>
+            </Column>
+          </Grid>
+          <Grid className={styles.gridRow}>
+            <Column lg={16} md={8} sm={4}>
+              <InputWrapper>
+                <Controller
+                  name="commentsToFulfiller"
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextArea
+                      enableCounter
+                      id="commentsToFulfillerInput"
+                      size="lg"
+                      labelText={t('commentsToFulfiller', 'Comments To Fulfiller')}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      maxCount={500}
+                      invalid={errors.commentsToFulfiller?.message}
+                      invalidText={errors.commentsToFulfiller?.message}
                     />
                   )}
                 />
