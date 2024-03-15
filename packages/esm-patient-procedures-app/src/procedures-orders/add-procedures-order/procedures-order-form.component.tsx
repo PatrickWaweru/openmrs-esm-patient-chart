@@ -39,7 +39,7 @@ import styles from './procedures-order-form.scss';
 import type { ProceduresOrderBasketItem, OrderFrequency } from '../../types';
 import { Add, ArrowLeft, Subtract } from '@carbon/react/icons';
 import { useOrderConfig } from '../order-config';
-export interface LabOrderFormProps {
+export interface ProceduresOrderFormProps {
   initialOrder: ProceduresOrderBasketItem;
   closeWorkspace: DefaultWorkspaceProps['closeWorkspace'];
   closeWorkspaceWithSavedChanges: DefaultWorkspaceProps['closeWorkspaceWithSavedChanges'];
@@ -49,12 +49,12 @@ export interface LabOrderFormProps {
 // Designs:
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06c440ee3f7af8747620
 //   https://app.zeplin.io/project/60d5947dd636aebbd63dce4c/screen/640b06d286e0aa7b0316db4a
-export function LabOrderForm({
+export function ProceduresOrderForm({
   initialOrder,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
-}: LabOrderFormProps) {
+}: ProceduresOrderFormProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();

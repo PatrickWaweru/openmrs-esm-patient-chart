@@ -79,7 +79,7 @@ export function prepProceduresOrderPostData(
   if (order.action === 'NEW' || order.action === 'RENEW') {
     return {
       action: 'NEW',
-      type: 'proceduresorder',
+      type: 'procedureorder',
       patient: patientUuid,
       careSetting: careSettingUuid,
       orderer: order.orderer,
@@ -91,7 +91,7 @@ export function prepProceduresOrderPostData(
   } else if (order.action === 'REVISE') {
     return {
       action: 'REVISE',
-      type: 'proceduresorder',
+      type: 'procedureorder',
       patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,
@@ -104,7 +104,7 @@ export function prepProceduresOrderPostData(
   } else if (order.action === 'DISCONTINUE') {
     return {
       action: 'DISCONTINUE',
-      type: 'proceduresorder',
+      type: 'procedureorder',
       patient: patientUuid,
       careSetting: order.careSetting,
       orderer: order.orderer,

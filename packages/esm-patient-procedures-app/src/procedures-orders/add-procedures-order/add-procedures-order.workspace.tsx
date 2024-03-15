@@ -11,7 +11,7 @@ import {
   type OrderBasketItem,
 } from '@openmrs/esm-patient-common-lib';
 import { TestTypeSearch } from './procedures-type-search';
-import { LabOrderForm } from './procedures-order-form.component';
+import { ProceduresOrderForm } from './procedures-order-form.component';
 import styles from './add-procedures-order.scss';
 import { type ProceduresOrderBasketItem } from '../../types';
 
@@ -80,7 +80,7 @@ export default function AddProceduresOrderWorkspace({
       ) : (
         <div>
           <p>Test 2</p>
-          <LabOrderForm
+          <ProceduresOrderForm
             initialOrder={currentLabOrder}
             closeWorkspace={closeWorkspace}
             closeWorkspaceWithSavedChanges={closeWorkspaceWithSavedChanges}
